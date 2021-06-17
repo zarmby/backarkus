@@ -1,6 +1,12 @@
 const usermodel = require("../models/user.model");
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const keys = require("../middlewares/keys");
+const bcrypt = require("bcryptjs");
+const validateRegisterInput = require("../validation/register");
+const validateLoginInput = require("../validation/login");
 const app = express();
+
 
 app.get("/", async (req, res) => {
   try {
@@ -49,62 +55,99 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  try {
-    const user = new usermodel(req.body);
-    let err = user.validateSync();
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        resp: 400,
-        msg: "Error: Error to insert user.",
-        cont: {
-          err,
-        },
-      });
-    }
-    const userfind = await usermodel.findOne({
-      email: { $regex: `${user.email}$`, $options: "i" },
-    });
-    if (userfind) {
-      return res.status(400).json({
-        ok: false,
-        resp: 400,
-        msg: "This email already exists",
-        cont: {
-          email: userfind,
-        },
-      });
-    }
-    const newuser = await user.save();
-    if (newuser.length <= 0) {
-      res.status(400).send({
-        estatus: "400",
-        err: true,
-        msg: "Error: user could not be registered.",
-        cont: {
-          newuser,
-        },
-      });
-    } else {
-      res.status(200).send({
-        estatus: "200",
-        err: false,
-        msg: "Success: Information inserted correctly.",
-        cont: {
-          newuser,
-        },
-      });
-    }
-  } catch (err) {
-    res.status(500).send({
-      estatus: "500",
-      err: true,
-      msg: "Error: Error to insert the user",
-      cont: {
-        err: Object.keys(err).length === 0 ? err.message : err,
-      },
-    });
-  }
+
+   const { errors, isValid } = validateRegisterInput(req.body);
+
+   if (!isValid) {
+     return res.status(400).json(errors);
+   }
+ 
+   usermodel.findOne({ email: req.body.email }).then(user => {
+     if (user) {
+       return res.status(400).json({ email: "Email already exists" });
+     } else {
+       const newUser = new usermodel({
+         IDcampus: req.body.IDcampus,
+         picture: req.body.picture,
+         name: req.body.name,
+         lastname: req.body.lastname,
+         email: req.body.email,
+         phonenumber: req.body.phonenumber,
+         userprofile: req.body.userprofile,
+         IDrole: req.body.IDrole,
+         account: req.body.account,
+         password: req.body.password
+       });
+ 
+       bcrypt.genSalt(10, (err, salt) => {
+         bcrypt.hash(newUser.password, salt, (err, hash) => {
+           if (err) throw err;
+           newUser.password = hash;
+           newUser
+             .save()
+             .then(user => res.json(user))
+             .catch(err => console.log(err));
+         });
+       });
+     }
+   });
+
+  // try {
+  //   const user = new usermodel(req.body);
+  //   let err = user.validateSync();
+  //   if (err) {
+  //     return res.status(400).json({
+  //       ok: false,
+  //       resp: 400,
+  //       msg: "Error: Error to insert user.",
+  //       cont: {
+  //         err,
+  //       },
+  //     });
+  //   }
+  //   const userfind = await usermodel.findOne({
+  //     email: { $regex: `${user.email}$`, $options: "i" },
+  //   });
+  //   if (userfind) {
+  //     return res.status(400).json({
+  //       ok: false,
+  //       resp: 400,
+  //       msg: "This email already exists",
+  //       cont: {
+  //         email: userfind,
+  //       },
+  //     });
+  //   }
+  //   const newuser = await user.save();
+  //   if (newuser.length <= 0) {
+  //     res.status(400).send({
+  //       estatus: "400",
+  //       err: true,
+  //       msg: "Error: user could not be registered.",
+  //       cont: {
+  //         newuser,
+  //       },
+  //     });
+  //   } else {
+  //     res.status(200).send({
+  //       estatus: "200",
+  //       err: false,
+  //       msg: "Success: Information inserted correctly.",
+  //       cont: {
+  //         newuser,
+  //       },
+  //     });
+  //   }
+  // } catch (err) {
+  //   res.status(500).send({
+  //     estatus: "500",
+  //     err: true,
+  //     msg: "Error: Error to insert the user",
+  //     cont: {
+  //       err: Object.keys(err).length === 0 ? err.message : err,
+  //     },
+  //   });
+  // }
 });
 
 app.put("/", async (req, res) => {
@@ -226,6 +269,58 @@ app.delete("/", async (req, res) => {
       },
     });
   }
+});
+
+app.post("/login", async (req, res) => {
+   //////// FORM VALIDATION
+   const { errors, isValid } = validateLoginInput(req.body);
+
+   //////// CHECK VALIDATION
+   if (!isValid) {
+     return res.status(400).json(errors);
+   }
+ 
+   const email = req.body.email;
+   const password = req.body.password;
+ 
+   ///////// FIND USER BY EMAIL
+   usermodel.findOne({ email }).then(user => {
+     /////// CHECK IF USER EXISTS
+     if (!user) {
+       return res.status(404).json({ emailnotfound: "Email not found" });
+     }
+ 
+     /////// CHECK PASSWORD
+     bcrypt.compare(password, user.password).then(isMatch => {
+       if (isMatch) {
+         // USER MATCHED
+         // CREATE JWT PAYLOAD
+         const payload = {
+           id: user.id,
+           name: user.name
+         };
+ 
+         // SIGN TOKEN
+         jwt.sign(
+           payload,
+           keys.secretOrKey,
+           {
+             expiresIn: 3600 // 1 hour in seconds
+           },
+           (err, token) => {
+             res.json({
+               success: true,
+               token: "Token " + token
+             });
+           }
+         );
+       } else {
+         return res
+           .status(400)
+           .json({ passwordincorrect: "Password incorrect" });
+       }
+     });
+   });
 });
 
 module.exports = app;

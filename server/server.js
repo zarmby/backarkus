@@ -1,12 +1,19 @@
-require("./config/db");
-require("colors");
-
 const hostname = "127.0.0.1";
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const app = express();
+const passport = require('passport');
+
+////////INITIALIZATIONS
+require("./config/db");
+require("colors");
+require('./middlewares/passport')(passport);
+
+////////MIDDLEWARES
+app.use(passport.initialize());
+////////////////////////
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,10 +29,13 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
+
+/////////ROUTES
 app.use("/api", require("./routes/index"));
 
-mongoose
-  .connect(process.env.URLDB, {
+
+/////////CONNECTION TO MONGODB
+mongoose.connect(process.env.URLDB, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
