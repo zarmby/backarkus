@@ -297,7 +297,8 @@ app.post("/login", async (req, res) => {
          // CREATE JWT PAYLOAD
          const payload = {
            id: user.id,
-           name: user.name
+           name: user.name,
+           lastname: user.lastname
          };
  
          // SIGN TOKEN
@@ -310,7 +311,9 @@ app.post("/login", async (req, res) => {
            (err, token) => {
              res.json({
                success: true,
-               token: "Token " + token
+               token: "Token " + token,
+               name: user.name,
+               lastname: user.lastname
              });
            }
          );
