@@ -298,7 +298,11 @@ app.post("/login", async (req, res) => {
          const payload = {
            id: user.id,
            name: user.name,
-           lastname: user.lastname
+           lastname: user.lastname,
+           email: user.email,
+           phonenumber: user.phonenumber,
+           userprofile: user.userprofile,
+           account: user.account
          };
  
          // SIGN TOKEN
@@ -312,8 +316,13 @@ app.post("/login", async (req, res) => {
              res.json({
                success: true,
                token: "Token " + token,
+               id: user.id,
                name: user.name,
-               lastname: user.lastname
+               lastname: user.lastname,
+               email: user.email,
+               phonenumber: user.phonenumber,
+               userprofile: user.userprofile,
+               account: user.account
              });
            }
          );
