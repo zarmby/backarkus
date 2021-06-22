@@ -4,7 +4,8 @@ const app = express();
 
 app.get("/", async (req, res) => {
   try {
-    const waiting = await waitingmodel.aggregate([{
+    const waiting = await waitingmodel.aggregate([
+      {
       $lookup: {
         from: "users",
         localField: "IDuser",
@@ -28,13 +29,14 @@ app.get("/", async (req, res) => {
     },
     {
       $project:{
-        name: 1,
+        _id: 0,
+        username: 1,
         lastname: 1,
         IDuser: 1,
+        tename: 1,
         IDtypeequiment: 1,
       }
-    }
-    
+    },
   ]);
   console.log(waiting);
     idWaiting = req.query.idWaiting;
