@@ -4,7 +4,31 @@ const app = express();
 
 app.get("/", async (req, res) => {
   try {
-    const assigned = await assignedmodel.find({ status: true });
+    const assigned = await assignedmodel.aggregate([
+      {
+        $lookup:{ 
+          from: "users",
+          localField: "IDuser",
+          foreignField: "_id",
+          as: "users",
+        },
+      },
+      { 
+        $lookup: {
+          from:"equipment",
+          localField: "serialnumber",
+          foreignField: "_id",
+          as:"equipment",
+        },
+      },
+      { 
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$users",0 ] }, "$$ROOT"]}}
+      },
+      {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$equipment",0 ] }, "$$ROOT"]}}
+      },
+      
+    ]);
     idAssigned = req.query.idAssigned;
     const assignedfind = await assignedmodel.findById(idAssigned);
     if(assignedfind){
@@ -74,7 +98,7 @@ app.post("/", async (req, res) => {
       res.status(200).send({
         estatus : "200",
         err: false,
-        msg: "Information obtained correctly.",
+        msg: "Success: Information inserted correctly.",
       });
     }
   } catch (err) {
