@@ -185,7 +185,7 @@ app.delete("/", async (req, res) => {
       });
     }
     idEquipment = req.query.idEquipment;
-    status = req.query.status;
+    status = req.body.status;
     const equipmentfind = await equipmentmodel.findById(idEquipment);
     if (!equipmentfind) {
       return res.status(404).send({
