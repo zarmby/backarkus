@@ -69,7 +69,7 @@ app.post("/", async (req, res) => {
        const newUser = new usermodel({
          IDcampus: req.body.IDcampus,
          picture: req.body.picture,
-         name: req.body.name,
+         username: req.body.username,
          lastname: req.body.lastname,
          email: req.body.email,
          phonenumber: req.body.phonenumber,
