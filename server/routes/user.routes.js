@@ -297,7 +297,7 @@ app.post("/login", async (req, res) => {
          // CREATE JWT PAYLOAD
          const payload = {
            id: user.id,
-           name: user.name,
+           username: user.username,
            lastname: user.lastname,
            email: user.email,
            phonenumber: user.phonenumber,
@@ -317,7 +317,7 @@ app.post("/login", async (req, res) => {
                success: true,
                token: "Token " + token,
                id: user.id,
-               name: user.name,
+               username: user.username,
                lastname: user.lastname,
                email: user.email,
                phonenumber: user.phonenumber,
