@@ -61,7 +61,7 @@ app.post("/", async (req, res) => {
    if (!isValid) {
      return res.status(400).json(errors);
    }
- 
+
    usermodel.findOne({ email: req.body.email }).then(user => {
      if (user) {
        return res.status(400).json({ email: "Email already exists" });
@@ -78,7 +78,7 @@ app.post("/", async (req, res) => {
          account: req.body.account,
          password: req.body.password
        });
- 
+
        bcrypt.genSalt(10, (err, salt) => {
          bcrypt.hash(newUser.password, salt, (err, hash) => {
            if (err) throw err;
@@ -279,17 +279,17 @@ app.post("/login", async (req, res) => {
    if (!isValid) {
      return res.status(400).json(errors);
    }
- 
+
    const email = req.body.email;
    const password = req.body.password;
- 
+
    ///////// FIND USER BY EMAIL
    usermodel.findOne({ email }).then(user => {
      /////// CHECK IF USER EXISTS
      if (!user) {
        return res.status(404).json({ emailnotfound: "Email not found" });
      }
- 
+
      /////// CHECK PASSWORD
      bcrypt.compare(password, user.password).then(isMatch => {
        if (isMatch) {
@@ -297,14 +297,14 @@ app.post("/login", async (req, res) => {
          // CREATE JWT PAYLOAD
          const payload = {
            id: user.id,
-           name: user.name,
+           username: user.username,
            lastname: user.lastname,
            email: user.email,
            phonenumber: user.phonenumber,
            userprofile: user.userprofile,
            account: user.account
          };
- 
+
          // SIGN TOKEN
          jwt.sign(
            payload,
@@ -317,7 +317,7 @@ app.post("/login", async (req, res) => {
                success: true,
                token: "Token " + token,
                id: user.id,
-               name: user.name,
+               username: user.username,
                lastname: user.lastname,
                email: user.email,
                phonenumber: user.phonenumber,
@@ -335,4 +335,4 @@ app.post("/login", async (req, res) => {
    });
 });
 
-module.exports = app; 
+module.exports = app;
