@@ -4,7 +4,19 @@ const app = express();
 
 app.get("/", async (req, res) => {
   try {
-    const equipment = await equipmentmodel.find({ status: true });
+    const equipment = await equipmentmodel.aggregate([
+      {
+        $lookup:{
+          from: "campus",
+          localField: "IDcampus",
+          foreignField: "_id",
+          as: "campus",
+        },
+      },
+      {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$campus",0 ] }, "$$ROOT"]}}
+      },
+    ]);
     idEquipment = req.query.idEquipment;
     const equipmentfind = await equipmentmodel.findById(idEquipment);
     if (equipmentfind) {
