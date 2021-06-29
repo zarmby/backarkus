@@ -23,10 +23,21 @@ app.get("/", async (req, res) => {
         },
       },
       {
+        $lookup:{
+          from: "users",
+          localField: "IDuser",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
         $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$campus",0 ] }, "$$ROOT"]}}
       },
       {
         $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$typeequipments",0 ] }, "$$ROOT"]}}
+      },
+      {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$user",0 ] }, "$$ROOT"]}}
       },
       { $match: { 
         tename: typeequipment
