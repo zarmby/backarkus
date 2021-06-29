@@ -1,4 +1,5 @@
 const assignedmodel = require("../models/assigned.model");
+const equipmentmodel = require("../models/equipments.model");
 const express = require("express");
 const app = express();
 
@@ -126,7 +127,7 @@ app.put("/", async (req, res) => {
     }
 
     req.body._id = idAssigned;
-    const assignedfind = await assignedmodel.findById(idAssigned)
+    const assignedfind = await assignedmodel.findById(idAssigned);
     if(!assignedfind){
       return res.status(404).send({
         estatus: "404",
@@ -192,7 +193,7 @@ app.delete("/", async (req, res) => {
       });
     }
     idAssigned = req.query.idAssigned;
-    const assignedfind = await assignedmodel.findById(idAssigned)
+    const assignedfind = await assignedmodel.findById(idAssigned);
     if(!assignedfind){
       return res.status(404).send({
         estatus: "404",

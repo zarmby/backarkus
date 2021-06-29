@@ -63,7 +63,7 @@ app.post("/", async (req, res) => {
       });
     }
     const campusfind = await campusmodel.findOne({
-      name: { $regex: `${campus.name}$`, $options: "i" },
+      campusname: { $regex: `${campus.campusname}$`, $options: "i" },
     });
     if (campusfind) {
       return res.status(400).json({

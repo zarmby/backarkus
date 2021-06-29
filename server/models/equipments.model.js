@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const equipmentSchema = new Schema({
   IDuser: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Users",
   },
   IDcampus: {
     type: Schema.Types.ObjectId,
