@@ -4,7 +4,7 @@ const app = express();
 
 app.get("/", async (req, res) => {
   try {
-    name = req.query.name;
+    typeequipment = req.query.typeequipment;
     const equipment = await equipmentmodel.aggregate([
       {
         $lookup:{
@@ -29,7 +29,7 @@ app.get("/", async (req, res) => {
         $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$typeequipments",0 ] }, "$$ROOT"]}}
       },
       { $match: { 
-        tename: name
+        tename: typeequipment
       }
     }
     ]);
