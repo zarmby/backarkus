@@ -1,6 +1,5 @@
 const Typeequipmentmodel = require("../models/typeequipment.model");
 const express = require("express");
-const typeequipmentModel = require("../models/typeequipment.model");
 const app = express();
 
 app.get("/", async (req, res) => {
