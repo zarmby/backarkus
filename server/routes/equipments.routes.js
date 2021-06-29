@@ -186,6 +186,79 @@ app.put("/", async (req, res) => {
   }
 });
 
+app.put("/assigned", async (req, res) => {
+  try {
+
+    const idEquipment = req.query.idEquipment;
+
+    if (idEquipment == '') {
+        return res.status(400).send({
+            estatus: '400',
+            err: true,
+            msg: 'Error: No se envio un id valido.',
+            cont: 0
+        });
+    }
+
+    req.body._id = idEquipment;
+
+    const equipmentfind = await equipmentmodel.findById(idEquipment);
+
+    if (!equipmentfind)
+        return res.status(404).send({
+            estatus: '404',
+            err: true,
+            msg: 'Error: No se encontro el equipo en la base de datos.',
+            cont: equipmentfind
+        });
+
+    const newequipment = new equipmentmodel(req.body);
+
+    let err = newequipment.validateSync();
+
+    if (err) {
+        return res.status(400).json({
+            ok: false,
+            resp: 400,
+            msg: 'Error: Error al Insertar el equipo.',
+            cont: {
+                err
+            }
+        });
+    }
+
+    const equipmentupdate = await equipmentmodel.findByIdAndUpdate(idPersona, { $set: newPersona }, { new: true });
+
+    if (!equipmentupdate) {
+        return res.status(400).json({
+            ok: false,
+            resp: 400,
+            msg: 'Error: Al intentar actualizar el equipo.',
+            cont: 0
+        });
+    } else {
+        return res.status(200).json({
+            ok: true,
+            resp: 200,
+            msg: 'Success: Se actualizo el equipo correctamente.',
+            cont: {
+              equipmentupdate
+            }
+        });
+    }
+
+} catch (err) {
+    res.status(500).send({
+        estatus: '500',
+        err: true,
+        msg: 'Error: Error al actualizar el equipo.',
+        cont: {
+            err: Object.keys(err).length === 0 ? err.message : err
+        }
+    });
+}
+});
+
 app.delete("/", async (req, res) => {
   try {
     if (req.query.idEquipment == "") {
