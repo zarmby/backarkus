@@ -41,11 +41,6 @@ app.get("/", async (req, res) => {
       },
       { $match: { 
         tename: typeequipment
-      },
-      $regexMatch: {
-        input: { $concat: ["$username", " ", "$lastname"] },
-        regex: "fullname",  //Your text search here
-        options: "i"
       }
       
     }
