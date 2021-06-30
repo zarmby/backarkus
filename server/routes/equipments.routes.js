@@ -4,6 +4,7 @@ const app = express();
 
 app.get("/", async (req, res) => {
   try {
+    typeequipment = req.query.typeequipment;
     const equipment = await equipmentmodel.aggregate([
       {
         $lookup:{
@@ -14,8 +15,41 @@ app.get("/", async (req, res) => {
         },
       },
       {
+        $lookup:{
+          from: "typeequipments",
+          localField: "IDtypeequipment",
+          foreignField: "_id",
+          as: "typeequipments",
+        },
+      },
+      {
+        $lookup:{
+          from: "users",
+          localField: "IDuser",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
         $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$campus",0 ] }, "$$ROOT"]}}
       },
+      {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$typeequipments",0 ] }, "$$ROOT"]}}
+      },
+      {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$user",0 ] }, "$$ROOT"]}}
+      },
+      { $match: { 
+        tename: typeequipment
+      },
+      $regexMatch: {
+        input: { $concat: ["$username", " ", "$lastname"] },
+        regex: "fullname",  //Your text search here
+        options: "i"
+      }
+      
+    }
+    
     ]);
     idEquipment = req.query.idEquipment;
     const equipmentfind = await equipmentmodel.findById(idEquipment);
@@ -161,7 +195,7 @@ app.put("/", async (req, res) => {
       return res.status(400).json({
         ok: false,
         resp: 400,
-        msg: "Error: Trying to update the role",
+        msg: "Error: Trying to update the equipment",
         cont: 0,
       });
     } else {

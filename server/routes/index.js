@@ -10,4 +10,6 @@ app.use("/user", require("./user.routes"));
 app.use("/waiting", require("./waiting.routes"));
 
 
+
+
 module.exports = app;

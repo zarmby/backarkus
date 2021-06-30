@@ -192,14 +192,14 @@ app.put("/", async (req, res) => {
       return res.status(400).json({
         ok: false,
         resp: 400,
-        msg: "Error: Trying to update the role.",
+        msg: "Error: Trying to update the user.",
         cont: 0,
       });
     } else {
       return res.status(200).json({
         ok: true,
         resp: 200,
-        msg: "Success: The role was updated successfully.",
+        msg: "Success: The user was updated successfully.",
         cont: {
           Userfind,
         },

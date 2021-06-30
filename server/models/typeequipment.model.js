@@ -10,6 +10,9 @@ const typeequipmentSchema = new Schema({
     type: Boolean,
     default: true,
   },
+  imagen: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("Typeequipment", typeequipmentSchema);
