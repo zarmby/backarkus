@@ -41,10 +41,8 @@ app.get("/", async (req, res) => {
       },
       { $match: { 
         tename: typeequipment
-      }
-      
-    }
-    
+      },
+    },
     ]);
     idEquipment = req.query.idEquipment;
     const equipmentfind = await equipmentmodel.findById(idEquipment);
